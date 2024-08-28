@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flowchart Example</title>
+    <style>
+        .flowchart {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .node {
+            padding: 10px 20px;
+            margin: 10px;
+            border: 2px solid #000;
+            border-radius: 5px;
+            text-align: center;
+            background-color: #70bdb3;
+            color: white;
+            cursor: url('pics/catcursor.png'), auto; /* Custom cursor */
+        }
+        .node:hover {
+            background-color: #1aac98;
+        }
+        .connector {
+            width: 2px;
+            height: 20px;
+            background-color: #000;
+            margin: 0 auto;
+        }
+        .horizontal {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 400px; /* Adjust as needed */
+        }
+        .connector-horizontal {
+            width: 150px;
+            height: 2px;
+            background-color: #000;
+            margin: 0 auto;
+            align-self: center;
+        }
+        .connector-diagonal {
+            width: 2px;
+            height: 20px;
+            background-color: #000;
+            transform: rotate(45deg);
+            margin: 0 auto;
+        }
+        .connector-vertical {
+            width: 2px;
+            height: 20px;
+            background-color: #000;
+            margin: 0 auto;
+        }
+        .card {
+            display: none;
+            position: fixed; /* Makes the card float */
+            top: 50%; /* Centers the card vertically */
+            left: 50%; /* Centers the card horizontally */
+            transform: translate(-50%, -50%); /* Adjusts the position to be exactly centered */
+            border: 1px solid #ccc;
+            padding: 20px;
+            background-color: #e9fffc;;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adds a shadow for a floating effect */
+            z-index: 1000; /* Ensures the card is above other elements */
+        }
+
+        .card.active {
+            display: block;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            function handleClick(buttonText) {
+                /*alert('Button clicked: ' + buttonText);*/
+                openCard(buttonText);
+            }
+
+            function openCard(buttonText) {
+                const card = document.createElement('div');
+                card.className = 'card active';
+                card.innerHTML = `
+                    <h2>${buttonText} Card</h2>
+                    <img src="pics/${buttonText.toLowerCase()}.jpg" alt="${buttonText} Image" style="width:100%;">
+                    <p>This is the ${buttonText} card content.</p>
+                    <button class="closeCardBtn">Close Card</button>
+                `;
+                document.body.appendChild(card);
+
+                card.querySelector('.closeCardBtn').addEventListener('click', function() {
+                    card.remove();
+                });
+            }
+
+            document.querySelectorAll('.node').forEach(button => {
+                button.addEventListener('click', function() {
+                    handleClick(this.textContent);
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="flowchart">
+        <button class="node" onclick="handleClick('Start')">Start</button>
+        <div class="connector"></div>
+        <button class="node" onclick="handleClick('Step 1')">Step 1</button>
+        <div class="connector"></div>
+        <button class="node" onclick="handleClick('Decision')">Decision</button>
+        <div class="horizontal">
+            <div class="connector-diagonal" style="transform: rotate(45deg);"></div>
+            <div class="connector-diagonal" style="transform: rotate(-45deg);"></div>
+        </div>
+        <div class="horizontal">
+            <button class="node" style="transform: translateX(10px);" onclick="handleClick('Yes')">Yes</button>
+            <button class="node" style="transform: translateX(-10px);" onclick="handleClick('No')">No</button>
+        </div>
+        <div class="horizontal">
+            <div class="connector-vertical" style="transform: translateX(-50px);"></div>
+            <div class="connector-vertical" style="transform: translateX(50px);"></div>
+        </div>
+        <div class="horizontal">
+            <button class="node" onclick="handleClick('Step 2')">Step 2</button>
+            <div class="connector-horizontal"></div>
+            <button class="node" onclick="handleClick('Step 3')">Step 3</button>
+        </div>
+        <div class="horizontal">
+            <div class="connector-vertical" style="transform: translateX(-50px);"></div>
+            <div class="connector-vertical" style="transform: translateX(50px);"></div>
+        </div>
+        <div class="horizontal">
+            <button class="node" onclick="handleClick('Step 4')">Step 4</button>
+            <div class="connector-horizontal"></div>
+            <button class="node" onclick="handleClick('Step 5')">Step 5</button>
+        </div>
+        <div class="horizontal">
+            <div class="connector-diagonal" style="transform: rotate(-45deg);"></div>
+            <div class="connector-diagonal" style="transform: rotate(45deg);"></div>
+        </div>
+        <button class="node" onclick="handleClick('Step 6')">Step 6</button>
+        <div class="connector"></div>
+        <button class="node" onclick="handleClick('End')">End</button>
+    </div>
+</body>
+</html>

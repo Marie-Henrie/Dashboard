@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="responsive.css">
+    <script src="index.js"></script>
+</head>
+
+<body>
+  
+    <!-- for header part -->
+    <header>
+        <div class="logosec">
+            <div class="logo">Learning Dashboard</div>
+            
+            <img src="pics/readingCat.png" class="icn menuicn" id="menuicn" alt="menu-icon">
+    
+        </div>
+        <div class="searchbar">
+            <input type="text" placeholder="Search">
+            <div class="searchbtn">
+                <img src="pics/cat.png" class="icn srchicn" alt="search-icon">
+            </div>
+        </div>
+        <div class="message">
+            <div class="circle"></div>
+            <img src="pics/cat.png" class="icn" alt="">
+            <div class="dp">
+                <img src="pics/cat.png" class="dpicn" alt="dp">
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="navcontainer">
+            <nav class="nav">
+                <div class="nav-upper-options">
+                 <!--   <class="nav-option-link">-->
+                    <div class="nav-option option2">
+                        <img src="pics/cat.png" class="nav-img" alt="dashboard">
+                        <h3><a href="index.html">RTDB</a></h3>
+                        
+                    </div>
+                    </a>
+                    <div class="nav-option option2">
+                        <img src="pics/lauchingCat.png" class="nav-img" alt="articles">
+                        
+                        <h3><a href="fundamentals.html">Fundamentals</a></h3>
+
+                      
+                    </div>
+                    <div class="nav-option option3">
+                        <img src="pics/cat.png" class="nav-img" alt="report">
+                        <h3>Administrator</h3>
+                    </div>
+                    <div class="nav-option option4">
+                        <img src="pics/cat.png" class="nav-img" alt="institution">
+                        <h3>C# Calculation</h3>
+                   
+                </div>
+            </nav>
+        </div>
+        
+        <div class="main">
+            <div class="searchbar2">
+                <input type="text" placeholder="Search">
+                <div class="searchbtn">
+                    <img src="pics/cat.png" class="icn srchicn" alt="search-button">
+                </div>
+            </div>
+
+            <div class="box-container">
+                <div class="box box1" onclick="handleLikesClick()">
+                    <div class="text">
+                        <h2 class="topic-heading">Ability History</h2>
+                        <!--<h2 class="topic">Article Views</h2>-->
+                    </div>
+                    <img src="pics/cat.png" alt="Views">
+                </div>
+
+                <div class="box box2" onclick="handleLikesClick2()">
+                    <div class="text">
+                        <h2 class="topic-heading">RTDB Basic</h2>
+                    </div>
+                    <img src="pics/cat.png" alt="likes">
+                </div>
+
+                <div class="box box3" onclick="handleLikesClick3()">
+                    <div class="text">
+                        <h2 class="topic-heading">Overview of View</h2>
+                    </div>
+                    <img src="pics/cat.png" alt="comments">
+                </div>
+
+               
+            </div>
+
+            <div id="reportSection" class="report-container">
+                <div class="report-header">
+                    <h1 class="recent-Articles">More Information</h1>
+                    <button class="view" onclick="showImage()">View All</button>
+                </div>
+                <div id="helloWorldText" style="display: none;">
+                    <h2>Hello World</h2>
+                </div>
+                <div id="Jiji" style="display: none;">
+                    <h2>Hello Jiji</h2>
+                </div>
+                <div id="siiri" style="display: none;">
+                    <img id="myImage" src="pics/siiri.jpg" alt="My Image">
+                </div>
+                <div id="text" style="display: none;">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+
+
+    function handleLikesClick() {
+            const helloWorldText = document.getElementById('helloWorldText');
+            
+            // Toggle visibility
+            if (helloWorldText.style.display === 'none' || helloWorldText.style.display === '') {
+                helloWorldText.style.display = 'block';
+            } else {
+                helloWorldText.style.display = 'none';
+            }
+            // Scroll into view
+            document.getElementById('reportSection').scrollIntoView({ behavior: 'smooth' });
+        }
+        function handleLikesClick2() {
+            const helloWorldText2 = document.getElementById('Jiji');
+            // Toggle visibility
+            if (helloWorldText2.style.display === 'none' || helloWorldText2.style.display === '') {
+                helloWorldText2.style.display = 'block';
+            } else {
+                helloWorldText2.style.display = 'none';
+            }
+            // Scroll into view
+            document.getElementById('reportSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+      
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuicn = document.getElementById('menuicn');
+            const nav = document.querySelector('.navcontainer');
+            menuicn.addEventListener('click', () => {
+                nav.classList.toggle('navclose');
+            });
+        });
+
+        /*function showImage() {
+            const imageDiv = document.getElementById('siiri');
+            
+            
+            if (imageDiv.style.display === 'none' || imageDiv.style.display === '') {
+                imageDiv.style.display = 'block';
+            } else {
+                imageDiv.style.display = 'none';
+            }
+                        
+            // Scroll into view
+            document.getElementById('reportSection').scrollIntoView({ behavior: 'smooth' });
+        }*/
+
+    function showImage() {
+    const jijiElement = document.getElementById('Jiji');
+    const helloWorldText = document.getElementById('helloWorldText');
+    const imageElement = document.getElementById('myImage');
+    const imageDiv = document.getElementById('siiri');
+
+    if (imageDiv.style.display === 'block') {
+        imageDiv.style.display = 'none';
+    } else {
+            imageElement.style.display = 'block';
+            if (jijiElement.style.display === 'block') {
+                imageElement.src = 'pics/siiri.jpg';
+            } else if (helloWorldText.style.display === 'block') {
+                imageElement.src = 'pics/cat.png';
+            } else {
+                imageElement.src = 'pics/lauchingCat.png';
+            }
+        
+        imageDiv.style.display = 'block';
+    }
+
+    // Scroll into view
+    document.getElementById('reportSection').scrollIntoView({ behavior: 'smooth' });
+}
+
+function handleLikesClick3() {
+            const helloWorldText3 = document.getElementById('text');
+            const filePath = 'C:\Users\FIMASON1\OneDrive - ABB\Code\dashboard\files\test.txt'; // Replace with the path to your text file
+
+            // Toggle visibility
+            if (helloWorldText3.style.display === 'none' || helloWorldText3.style.display === '') {
+                fetch(filePath)
+                    .then(response => response.text())
+                    .then(data => {
+                        helloWorldText3.textContent = data;
+                        helloWorldText3.style.display = 'block';
+                    })
+                    .catch(error => console.error('Error fetching the text file:', error));
+            } else {
+                helloWorldText3.style.display = 'none';
+            }
+
+            // Scroll into view
+            document.getElementById('reportSection').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
