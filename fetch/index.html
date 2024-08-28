@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch Data Example</title>
+</head>
+<body>
+    <h1>Tiedot:</h1>
+    <div>
+        <p class="tieto">tiedot</p>
+        <button onclick="addCatToTieto()">Get data</button>
+        <button type="button" onclick="saveTextToFile();">Save Text File</button>
+        <button type="button" onclick="readText();">Read text</button>
+
+    </div>
+    <ul id="data-list"></ul>
+
+    <input type="file" name="inputfile" id="inputfile">
+    <br>
+
+    <pre id="output"></pre>
+
+
+
+    <script type="text/javascript">
+      
+       document.getElementById('inputfile')
+            .addEventListener('change', function () {
+
+                let fr = new FileReader();
+                fr.onload = function () {
+                    document.getElementById('output')
+                        .textContent = fr.result;
+                }
+
+                fr.readAsText(this.files[0]);
+            })
+
+        
+        
+    </script>
+   
+   
+</body>
+</html>
