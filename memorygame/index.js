@@ -1,7 +1,10 @@
-const cardImages = [
-    'image1.jpg', 'image2.jpg', 'image3.jpg', 'image4.jpg', 
-    'image5.jpg', 'image6.jpg', 'image7.jpg', 'image8.jpg'
-   ]; // These should match the image filenames in your pics/ folder
+const imageCount = 8; // Number of images you have
+const cardImages = [];
+
+// Generate the cardImages array based on the number of images
+for (let i = 1; i <= imageCount; i++) {
+    cardImages.push(`image${i}.jpg`);
+}
 
 let cards, firstCard, secondCard;
 let lockBoard = false;
