@@ -44,7 +44,7 @@ h1 {
 }
 
 #reset-button {
-    margin-top: auto; /* Automatically push the button to the bottom */
+    margin-top: 20px; /* Space between game board and button */
     padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
