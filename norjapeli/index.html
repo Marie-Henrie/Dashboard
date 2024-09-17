@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Map</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Fullscreen container for map and right panel */
+        .container {
+            display: flex;
+            height: 100vh; /* Full viewport height */
+        }
+
+        /* Map on the left side */
+        .map-container {
+            flex: 40%; /* Takes up 40% of the screen */
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            height: 100%; /* Ensure the container is 100% of the viewport height */
+            position: relative;
+        }
+
+        /* Circles as cities */
+        .city {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10; /* Ensure cities are visible above the map */
+        }
+
+        .city.red {
+            background-color: red;
+        }
+
+        .city.green {
+            background-color: rgb(6, 188, 36);
+        }
+
+        .city.blue {
+            background-color: rgb(68, 157, 241);
+        }
+
+        .city.pink {
+            background-color: rgb(241, 68, 209);
+            width: 10px;
+            height: 10px;
+        }
+
+        /* Tooltip styling */
+        .tooltip {
+            position: absolute;
+            bottom: 100%; /* Position tooltip above the city */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.75);
+            color: #fff;
+            padding: 5px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            display: none; /* Hidden by default */
+            z-index: 10;
+            margin-bottom: 5px;
+        }
+
+        /* Show tooltip on hover */
+        .city:hover .tooltip {
+            display: block;
+        }
+
+        /* Right side panel */
+        .right-panel {
+            flex: 50%; /* Takes up 50% of the screen */
+            background-color: #f8f8f8;
+            padding: 20px;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow-y: auto;
+        }
+
+        /* Top corner menu */
+        .menu {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .menu a {
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .menu a:hover {
+            background-color: #eee;
+        }
+
+        /* Content on the right side of the map after clicking */
+        .content {
+            display: none;
+            margin-top: 20px;
+        }
+
+        /* Style for the main image */
+        .main-photo {
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Map Section -->
+        <div class="map-container" id="mapContainer">
+            <!-- Cities will be dynamically added here -->
+            <img src="images/siiri.jpg" alt="Main Photo" class="main-photo" id="siiriPhoto">
+        </div>
+
+        <!-- Right Panel with Menu -->
+        <div class="right-panel">
+            <div class="menu">
+                <a id="norjaLink">Norja</a>
+                <a id="ruotsiLink">Ruotsi</a>
+                <a id="suomiLink">Suomi</a>
+            </div>
+            <!-- Content to show the story after clicking the city -->
+            <div id="content-area" class="content">
+                <h2 id="city-title">City Details</h2>
+                <p id="city-story">This is where stories and pictures will appear after clicking the city on the map.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const mapContainer = document.getElementById('mapContainer');
+        const cityTitle = document.getElementById('city-title');
+        const cityStory = document.getElementById('city-story');
+        const contentArea = document.getElementById('content-area');
+
+        // Function to create and show cities dynamically
+        function createCity(city, mapContainer) {
+            const cityElement = document.createElement('div');
+            cityElement.className = `city ${city.color}`;
+            cityElement.style.top = city.top;
+            cityElement.style.left = city.left;
+            cityElement.setAttribute('data-city', city.name);
+
+            // Create tooltip element
+            const tooltip = document.createElement('div');
+            tooltip.className = 'tooltip';
+            tooltip.textContent = city.name; // Set the city name as the tooltip text
+
+            // Append tooltip to city element
+            cityElement.appendChild(tooltip);
+
+            // Show story when city is clicked
+            cityElement.addEventListener('click', () => {
+                if (city.type === 'green') {
+                    // Update map for green city
+                    handleMapChange(city.newMapUrl, city.newCities);
+                    return;
+                }
+
+                // Display the story on the right panel
+                cityTitle.textContent = city.name;
+                cityStory.textContent = city.story;
+                contentArea.style.display = 'block'; // Show content area
+            });
+
+            mapContainer.appendChild(cityElement);
+        }
+
+        // Function to update the map and cities
+        function handleMapChange(mapUrl, cities) {
+            // Update map background image
+            mapContainer.style.backgroundImage = `url(${mapUrl})`;
+
+            // Remove any existing cities
+            mapContainer.innerHTML = '';
+
+            // Create new cities for the current map
+            cities.forEach(city => createCity(city, mapContainer));
+        }
+
+        // Function to hide the story panel
+        function hideStory() {
+            contentArea.style.display = 'none'; // Hide the content area
+            cityTitle.textContent = ''; // Clear the title
+            cityStory.textContent = ''; // Clear the story
+        }
+
+        // Menu click events to change maps and cities
+        document.getElementById('norjaLink').addEventListener('click', () => {
+            hideStory(); // Hide the story when switching maps
+            handleMapChange('images/norja.png', [
+                { name: 'City 1', top: '40%', left: '50%', color: 'red', story: 'Story about City 1' },
+                { name: 'City 2', top: '60%', left: '30%', color: 'red', story: 'Story about City 2' },
+                { name: 'New Map', top: '80%', left: '80%', color: 'green', type: 'green', newMapUrl: 'images/pohjoisnorja.png', newCities: [
+                    { name: 'New City 7', top: '10%', left: '20%', color: 'pink', story: 'Story about New City 7' },
+                    { name: 'New City 8', top: '30%', left: '40%', color: 'pink', story: 'Story about New City 8' }
+                ]}
+            ]);
+        });
+
+        document.getElementById('ruotsiLink').addEventListener('click', () => {
+            hideStory(); // Hide the story when switching maps
+            handleMapChange('images/ruotsi.png', [
+                { name: 'City 3', top: '30%', left: '20%', color: 'blue', story: 'Story about City 3' },
+                { name: 'City 4', top: '70%', left: '40%', color: 'blue', story: 'Story about City 4' }
+            ]);
+        });
+
+        document.getElementById('suomiLink').addEventListener('click', () => {
+            hideStory(); // Hide the story when switching maps
+            handleMapChange('images/suomi.png', [
+                { name: 'City 5', top: '23%', left: '47%', color: 'blue', story: 'Story about City 5' },
+                { name: 'City 6', top: '44%', left: '50%', color: 'blue', story: 'Story about City 6' }
+            ]);
+        });
+    </script>
+</body>
+</html>

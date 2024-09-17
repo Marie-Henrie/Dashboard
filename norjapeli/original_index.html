@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Map</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Fullscreen container for map and right panel */
+        .container {
+            display: flex;
+            height: 100vh; /* Full viewport height */
+        }
+
+        /* Map on the left side */
+        .map-container {
+            flex: 40%; /* Takes up 40% of the screen */
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            height: 100%; /* Ensure the container is 100% of the viewport height */
+            position: relative;
+        }
+
+        /* Circles as cities */
+        .city {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .city.red {
+            background-color: red;
+        }
+
+        .city.green {
+            background-color: rgb(6, 188, 36);
+        }
+        .city.blue {
+            background-color: rgb(68, 157, 241);
+        }
+        .city.pink {
+            background-color: rgb(241, 68, 209);
+            width: 10px;
+            height: 10px;
+        }
+
+        /* Right side panel */
+        .right-panel {
+            flex: 50%; /* Takes up 50% of the screen */
+            background-color: #f8f8f8;
+            padding: 20px;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow-y: auto;
+        }
+
+        /* Top corner menu */
+        .menu {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .menu a {
+            text-decoration: none;
+            color: black;
+            font-weight: bold;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .menu a:hover {
+            background-color: #eee;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            width: 80%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        .modal img {
+            width: 100%;
+            max-width: 300px;
+            cursor: pointer;
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: black;
+        }
+
+        /* Content on the right side of the map after clicking */
+        .content {
+            display: none;
+            margin-top: 20px;
+        }
+
+        /* Style for the main image */
+        .main-photo {
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Map Section -->
+        <div class="map-container" id="mapContainer">
+            <!-- Cities will be dynamically added here -->
+            <img src="images/siiri.jpg" alt="Main Photo" class="main-photo" id="siiriPhoto">
+        </div>
+
+        <!-- Right Panel with Menu -->
+        <div class="right-panel">
+            <div class="menu">
+                <a id="norjaLink">Norja</a>
+                <a id="ruotsiLink">Ruotsi</a>
+                <a id="suomiLink">Suomi</a>
+            </div>
+            <!-- Content to show the story after clicking the city -->
+            <div id="content-area" class="content">
+                <h2 id="city-title">City Details</h2>
+                <p id="city-story">This is where stories and pictures will appear after clicking the city on the map.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for showing images -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <img src="images/siiri.jpg" id="modalImage" alt="City Image">
+            <br>
+            <!-- Add a button/link to open the story on the right side -->
+            <a href="#" id="viewStoryLink" style="margin-top: 20px; display: inline-block;">View Story</a>
+        </div>
+    </div>
+
+    <script>
+        const mapContainer = document.getElementById('mapContainer');
+        const siiriPhoto = document.querySelector('.main-photo');
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        const closeModal = document.getElementById('closeModal');
+        const cityTitle = document.getElementById('city-title');
+        const cityStory = document.getElementById('city-story');
+        const contentArea = document.getElementById('content-area');
+        const viewStoryLink = document.getElementById('viewStoryLink');
+    
+        // Close the modal when clicking the close button
+        closeModal.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+    
+        // Function to create and show cities dynamically
+        function createCity(city, mapContainer) {
+            const cityElement = document.createElement('div');
+            cityElement.className = `city ${city.color}`;
+            cityElement.style.top = city.top;
+            cityElement.style.left = city.left;
+            cityElement.setAttribute('data-city', city.name);
+    
+            // Show modal when city is clicked
+            cityElement.addEventListener('click', () => {
+                if (city.type === 'green') {
+                    // Update map for green city
+                    handleMapChange(city.newMapUrl, city.newCities);
+                    return;
+                }
+    
+                // Display the modal with the image for non-green cities
+                modal.style.display = 'flex';
+                modalImg.src = city.image;
+    
+                // Update the "View Story" link behavior
+                viewStoryLink.removeEventListener('click', viewStoryHandler); // Remove previous handler
+                viewStoryLink.addEventListener('click', viewStoryHandler);
+    
+                function viewStoryHandler(event) {
+                    event.preventDefault(); // Prevent the link from navigating
+    
+                    // Update the right panel with the city name and story
+                    cityTitle.textContent = city.name;
+                    cityStory.textContent = city.story;
+    
+                    // Make sure the content area is visible
+                    contentArea.style.display = 'block'; 
+    
+                    // Close the modal
+                    modal.style.display = 'none';
+                }
+            });
+    
+            mapContainer.appendChild(cityElement);
+        }
+    
+        // Function to update the map and cities
+        function updateMap(mapUrl, cities) {
+            // Update map background image
+            mapContainer.style.backgroundImage = `url(${mapUrl})`;
+    
+            // Show or hide the siiri photo
+            siiriPhoto.style.display = 'none'; // Hide siiri photo
+    
+            // Remove any existing cities
+            mapContainer.innerHTML = '';
+    
+            // Create new cities for the current map
+            cities.forEach(city => createCity(city, mapContainer));
+        }
+    
+        // Function to handle map changes with nested maps
+        function handleMapChange(mapUrl, cities) {
+            updateMap(mapUrl, cities);
+    
+            // Add event listeners for "New Map" cities
+            cities.forEach(city => {
+                if (city.type === 'green') {
+                    const newMapElement = document.querySelector(`[data-city="${city.name}"]`);
+                    if (newMapElement) {
+                        newMapElement.addEventListener('click', () => {
+                            updateMap(city.newMapUrl, city.newCities);
+                        });
+                    }
+                }
+            });
+        }
+    
+        // Function to hide the story panel
+        function hideStory() {
+            contentArea.style.display = 'none'; // Hide the content area
+            cityTitle.textContent = ''; // Clear the title
+            cityStory.textContent = ''; // Clear the story
+        }
+    
+        // Menu click events to change maps and cities
+        document.getElementById('norjaLink').addEventListener('click', () => {
+            hideStory(); // Hide the story when switching maps
+            handleMapChange('images/norja.png', [
+                { name: 'City 1', top: '40%', left: '50%', color: 'red', image: 'images/norja.png', story: 'Story about City 1' },
+                { name: 'City 2', top: '60%', left: '30%', color: 'red', image: 'images/city2.jpg', story: 'Story about City 2' },
+                { name: 'New Map', top: '80%', left: '80%', color: 'green', type: 'green', newMapUrl: 'images/pohjoisnorja.png', newCities: [
+                    { name: 'New City 7', top: '10%', left: '20%', color: 'pink', image: 'images/cat.png', story: 'Story about New City 7' },
+                    { name: 'New City 8', top: '30%', left: '40%', color: 'pink', image: 'images/cat.png', story: 'Story about New City 8' }
+                ]}
+            ]);
+        });
+    
+        document.getElementById('ruotsiLink').addEventListener('click', () => {
+            hideStory(); // Hide the story when switching maps
+            handleMapChange('images/ruotsi.png', [
+                { name: 'City 3', top: '30%', left: '20%', color: 'red', image: 'images/city3.jpg', story: 'Story about City 3' },
+                { name: 'City 4', top: '70%', left: '40%', color: 'red', image: 'images/city4.jpg', story: 'Story about City 4' }
+            ]);
+        });
+    
+        document.getElementById('suomiLink').addEventListener('click', () => {
+            hideStory(); // Hide the story when switching maps
+            handleMapChange('images/suomi.png', [
+                { name: 'City 5', top: '23%', left: '47%', color: 'blue', image: 'images/city5.jpg', story: 'Story about City 5' },
+                { name: 'City 6', top: '44%', left: '50%', color: 'blue', image: 'images/city6.jpg', story: 'Story about City 6' }
+            ]);
+        });
+    
+        // Clicking on the modal image closes the modal
+        modalImg.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+    </script>
+    
+    
+    
+</body>
+</html>

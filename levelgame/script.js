@@ -191,7 +191,7 @@ function checkMouseCollision() {
         catRect.top < mouseRect.bottom &&
         catRect.bottom > mouseRect.top
     ) {
-        alert('You caught the mouse! Level Complete!');
+        alert('You find the cat! Level Complete!');
         
         // Clear all target movement timers to stop targets from moving
         targetTimers.forEach(timerId => clearTimeout(timerId));
