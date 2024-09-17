@@ -119,16 +119,48 @@
             margin-top: 20px;
         }
 
-        /* Style for the main image */
-        .main-photo {
+        /* Gallery styling */
+        .gallery {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .gallery img {
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            display: none;
+        }
+
+        .gallery img.active {
+            display: block;
+        }
+
+        .gallery-controls {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .gallery-controls button {
+            padding: 10px;
+            border: none;
+            background-color: #ddd;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .gallery-controls button:hover {
+            background-color: #ccc;
+        }
+          /* Style for the main image */
+          .main-photo {
             width: 100%;
             max-width: 600px;
             margin-bottom: 20px;
         }
 
-        .hidden {
-            display: none;
-        }
     </style>
 </head>
 <body>
@@ -151,6 +183,17 @@
             <div id="content-area" class="content">
                 <h2 id="city-title">City Details</h2>
                 <p id="city-story">This is where stories and pictures will appear after clicking the city on the map.</p>
+                
+                <!-- Image Gallery -->
+                <div class="gallery" id="gallery">
+                    <img src="" alt="Gallery Image" id="galleryImage1" class="active">
+                    <img src="" alt="Gallery Image" id="galleryImage2">
+                    <img src="" alt="Gallery Image" id="galleryImage3">
+                    <div class="gallery-controls">
+                        <button id="prevBtn">Previous</button>
+                        <button id="nextBtn">Next</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -160,6 +203,10 @@
         const cityTitle = document.getElementById('city-title');
         const cityStory = document.getElementById('city-story');
         const contentArea = document.getElementById('content-area');
+        const galleryImages = document.querySelectorAll('.gallery img');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        let currentImageIndex = 0;
 
         // Function to create and show cities dynamically
         function createCity(city, mapContainer) {
@@ -177,7 +224,7 @@
             // Append tooltip to city element
             cityElement.appendChild(tooltip);
 
-            // Show story when city is clicked
+            // Show story and gallery when city is clicked
             cityElement.addEventListener('click', () => {
                 if (city.type === 'green') {
                     // Update map for green city
@@ -189,10 +236,42 @@
                 cityTitle.textContent = city.name;
                 cityStory.textContent = city.story;
                 contentArea.style.display = 'block'; // Show content area
+
+                // Load the gallery images
+                loadGalleryImages(city.images);
             });
 
             mapContainer.appendChild(cityElement);
         }
+
+        // Function to load images into the gallery
+        function loadGalleryImages(images) {
+            galleryImages.forEach((img, index) => {
+                img.src = images[index] || '';
+                img.style.display = images[index] ? 'block' : 'none';
+            });
+            currentImageIndex = 0;
+            updateGallery();
+        }
+
+        // Function to update the active gallery image
+        function updateGallery() {
+            galleryImages.forEach((img, index) => {
+                img.classList.toggle('active', index === currentImageIndex);
+            });
+        }
+
+        // Previous button functionality
+        prevBtn.addEventListener('click', () => {
+            currentImageIndex = (currentImageIndex > 0) ? currentImageIndex - 1 : galleryImages.length - 1;
+            updateGallery();
+        });
+
+        // Next button functionality
+        nextBtn.addEventListener('click', () => {
+            currentImageIndex = (currentImageIndex < galleryImages.length - 1) ? currentImageIndex + 1 : 0;
+            updateGallery();
+        });
 
         // Function to update the map and cities
         function handleMapChange(mapUrl, cities) {
@@ -217,11 +296,11 @@
         document.getElementById('norjaLink').addEventListener('click', () => {
             hideStory(); // Hide the story when switching maps
             handleMapChange('images/norja.png', [
-                { name: 'City 1', top: '40%', left: '50%', color: 'red', story: 'Story about City 1' },
-                { name: 'City 2', top: '60%', left: '30%', color: 'red', story: 'Story about City 2' },
-                { name: 'New Map', top: '80%', left: '80%', color: 'green', type: 'green', newMapUrl: 'images/pohjoisnorja.png', newCities: [
-                    { name: 'New City 7', top: '10%', left: '20%', color: 'pink', story: 'Story about New City 7' },
-                    { name: 'New City 8', top: '30%', left: '40%', color: 'pink', story: 'Story about New City 8' }
+                { name: 'City 1', top: '40%', left: '50%', color: 'red', story: 'Story about City 1', images: ['images/siiri.jpg', 'images/cat.png'] },
+                { name: 'City 2', top: '60%', left: '30%', color: 'red', story: 'Story about City 2', images: ['images/city2-1.jpg', 'images/city2-2.jpg'] },
+                { name: 'Pohjois-Norja', top: '23%', left: '45%', color: 'green', type: 'green', newMapUrl: 'images/pohjoisnorja.png', newCities: [
+                    { name: 'Å i Lofoten', top: '77%', left: '11%', color: 'pink', story: 'Story about New City 7', images: ['images/city7-1.jpg', 'images/city7-2.jpg'] },
+                    { name: 'Senja', top: '45%', left: '50%', color: 'pink', story: 'Story about New City 8', images: ['images/city8-1.jpg', 'images/city8-2.jpg'] }
                 ]}
             ]);
         });
@@ -229,16 +308,16 @@
         document.getElementById('ruotsiLink').addEventListener('click', () => {
             hideStory(); // Hide the story when switching maps
             handleMapChange('images/ruotsi.png', [
-                { name: 'City 3', top: '30%', left: '20%', color: 'blue', story: 'Story about City 3' },
-                { name: 'City 4', top: '70%', left: '40%', color: 'blue', story: 'Story about City 4' }
+                { name: 'City 3', top: '30%', left: '20%', color: 'blue', story: 'Story about City 3', images: ['images/city3-1.jpg', 'images/city3-2.jpg'] },
+                { name: 'City 4', top: '70%', left: '40%', color: 'blue', story: 'Story about City 4', images: ['images/city4-1.jpg', 'images/city4-2.jpg'] }
             ]);
         });
 
         document.getElementById('suomiLink').addEventListener('click', () => {
             hideStory(); // Hide the story when switching maps
             handleMapChange('images/suomi.png', [
-                { name: 'City 5', top: '23%', left: '47%', color: 'blue', story: 'Story about City 5' },
-                { name: 'City 6', top: '44%', left: '50%', color: 'blue', story: 'Story about City 6' }
+                { name: 'City 5', top: '23%', left: '47%', color: 'blue', story: 'Story about City 5', images: ['images/city5-1.jpg', 'images/city5-2.jpg'] },
+                { name: 'City 6', top: '44%', left: '50%', color: 'blue', story: 'Story about City 6', images: ['images/city6-1.jpg', 'images/city6-2.jpg'] }
             ]);
         });
     </script>
