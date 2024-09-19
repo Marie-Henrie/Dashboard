@@ -31,11 +31,10 @@
         /* Circles as cities */
         .city {
             position: absolute;
-            width: 20px;
-            height: 20px;
             border-radius: 50%;
             cursor: pointer;
             z-index: 10; /* Ensure cities are visible above the map */
+            transform: translate(-50%, -50%); /* Center the city marker */
         }
 
         .city.red {
@@ -136,29 +135,43 @@
             display: block;
         }
 
-        .gallery-controls {
-            margin-top: 10px;
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .gallery-controls button {
-            padding: 10px;
-            border: none;
-            background-color: #ddd;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-
-        .gallery-controls button:hover {
-            background-color: #ccc;
-        }
           /* Style for the main image */
           .main-photo {
             width: 100%;
             max-width: 600px;
             margin-bottom: 20px;
+        }
+               
+        /* Media Queries for Responsive Layouts */
+        @media (min-width: 768px) {
+            .container {
+                flex-direction: row; /* Side-by-side layout for larger screens */
+            }
+
+            .map-container {
+                flex: 40%;
+            }
+
+            .right-panel {
+                flex: 60%;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .map-container {
+                flex: 50%;
+            }
+
+            .right-panel {
+                flex: 50%;
+            }
+        }
+
+        /* Responsive Menu */
+        @media (max-width: 600px) {
+            .menu {
+                flex-direction: column; /* Stack menu vertically on small screens */
+            }
         }
 
     </style>
@@ -189,10 +202,6 @@
                     <img src="" alt="Gallery Image" id="galleryImage1" class="active">
                     <img src="" alt="Gallery Image" id="galleryImage2">
                     <img src="" alt="Gallery Image" id="galleryImage3">
-                    <div class="gallery-controls">
-                        <button id="prevBtn">Previous</button>
-                        <button id="nextBtn">Next</button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -204,12 +213,10 @@
         const cityStory = document.getElementById('city-story');
         const contentArea = document.getElementById('content-area');
         const galleryImages = document.querySelectorAll('.gallery img');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
         let currentImageIndex = 0;
 
         // Function to create and show cities dynamically
-        function createCity(city, mapContainer) {
+        function createCity(city) {
             const cityElement = document.createElement('div');
             cityElement.className = `city ${city.color}`;
             cityElement.style.top = city.top;
@@ -248,9 +255,9 @@
         function loadGalleryImages(images) {
             galleryImages.forEach((img, index) => {
                 img.src = images[index] || '';
-                img.style.display = images[index] ? 'block' : 'none';
+                img.style.display = images[index] ? 'block' : 'none'; // Only display the images that exist
             });
-            currentImageIndex = 0;
+            currentImageIndex = 0; // Start at the first image
             updateGallery();
         }
 
@@ -261,29 +268,39 @@
             });
         }
 
-        // Previous button functionality
-        prevBtn.addEventListener('click', () => {
-            currentImageIndex = (currentImageIndex > 0) ? currentImageIndex - 1 : galleryImages.length - 1;
-            updateGallery();
-        });
-
-        // Next button functionality
-        nextBtn.addEventListener('click', () => {
-            currentImageIndex = (currentImageIndex < galleryImages.length - 1) ? currentImageIndex + 1 : 0;
-            updateGallery();
-        });
-
         // Function to update the map and cities
         function handleMapChange(mapUrl, cities) {
             // Update map background image
             mapContainer.style.backgroundImage = `url(${mapUrl})`;
+            mapContainer.style.backgroundSize = 'contain'; // Ensure the map scales correctly
 
             // Remove any existing cities
             mapContainer.innerHTML = '';
 
             // Create new cities for the current map
-            cities.forEach(city => createCity(city, mapContainer));
+            cities.forEach(city => createCity(city));
+
+            // Resize cities to match the new map size
+            resizeCities();
         }
+
+        // Function to resize cities
+        function resizeCities() {
+            const mapWidth = mapContainer.offsetWidth;
+            const mapHeight = mapContainer.offsetHeight;
+            const baseSize = 20; // Base size of the city marker
+            const scaleFactor = Math.min(mapWidth / 1000, mapHeight / 1000); // Adjust this based on your map size
+
+            const cityElements = document.querySelectorAll('.city');
+            cityElements.forEach(city => {
+                city.style.width = `${baseSize * scaleFactor}px`;
+                city.style.height = `${baseSize * scaleFactor}px`;
+            });
+        }
+
+        // Call resize function initially and when window is resized
+        window.addEventListener('resize', resizeCities);
+        resizeCities(); // Initial call to set correct size
 
         // Function to hide the story panel
         function hideStory() {
@@ -296,12 +313,12 @@
         document.getElementById('norjaLink').addEventListener('click', () => {
             hideStory(); // Hide the story when switching maps
             handleMapChange('images/norja.png', [
-                { name: 'City 1', top: '40%', left: '50%', color: 'red', story: 'Story about City 1', images: ['images/siiri.jpg', 'images/cat.png'] },
+                { name: 'City 1', top: '40%', left: '50%', color: 'red', story: 'Story about City 1', images: ['images/siiri.jpg', 'images/cat.png', 'images/cat.png'] },
                 { name: 'City 2', top: '60%', left: '30%', color: 'red', story: 'Story about City 2', images: ['images/city2-1.jpg', 'images/city2-2.jpg'] },
                 { name: 'Pohjois-Norja', top: '23%', left: '45%', color: 'green', type: 'green', newMapUrl: 'images/pohjoisnorja.png', newCities: [
                     { name: 'Å i Lofoten', top: '77%', left: '11%', color: 'pink', story: 'Story about New City 7', images: ['images/city7-1.jpg', 'images/city7-2.jpg'] },
                     { name: 'Senja', top: '45%', left: '50%', color: 'pink', story: 'Story about New City 8', images: ['images/city8-1.jpg', 'images/city8-2.jpg'] }
-                ]}
+                ] }
             ]);
         });
 
