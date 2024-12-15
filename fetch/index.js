@@ -5,7 +5,7 @@ async function addCatToTieto() {
         const response = await fetch(apiUrl, {
             method: 'GET',
             headers: {
-            'x-api-key': '573e8b8a70c64554bc134ffdeb9f82ec'
+            'x-api-key': 'code here'
             }    
         });
 
